@@ -1,7 +1,7 @@
 import { Game } from "../Game";
-import { Container } from "pixi.js";
+import * as PIXI from "pixi.js";
 
-export abstract class Scene extends Container {
+export abstract class Scene extends PIXI.Container {
   protected game: Game;
   constructor(game: Game, name: string = "Stage") {
     super();

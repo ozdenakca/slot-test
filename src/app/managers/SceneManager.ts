@@ -1,15 +1,15 @@
 import { Game } from "../Game";
 import { Scene } from "../types/Scene";
-import { Container } from "pixi.js";
+import * as PIXI from "pixi.js";
 
 export class SceneManager {
   protected game: Game;
-  private _mainContainer: Container = new Container();
+  private _mainContainer: PIXI.Container = new PIXI.Container();
   private _scenes: any = {};
   private _currentStage!: Scene;
   constructor(game: Game) {
     this.game = game;
-    this._mainContainer = new Container();
+    this._mainContainer = new PIXI.Container();
     this._mainContainer.name = "RootContainer";
   }
 
@@ -45,7 +45,7 @@ export class SceneManager {
     return this._scenes;
   }
 
-  public get main(): Container {
+  public get main(): PIXI.Container {
     return this._mainContainer;
   }
 }

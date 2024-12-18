@@ -1,6 +1,6 @@
 import { Events } from "../Events";
 import { EventEmitter } from "eventemitter3";
-import { Application, Container, Ticker } from "pixi.js";
+import * as PIXI from "pixi.js";
 
 const SIZE = [2000, 1500];
 const RATIO = SIZE[0] / SIZE[1];
@@ -11,17 +11,17 @@ export enum DisplayOrientation {
 }
 
 export class DisplayManager extends EventEmitter {
-  private _app: Application;
-  private _mainContainer: Container;
+  private _app: PIXI.Application;
+  private _mainContainer: PIXI.Container;
   private resolution: number = 1;
 
-  constructor(mainContainer: Container) {
+  constructor(mainContainer: PIXI.Container) {
     super();
     this._mainContainer = mainContainer;
   }
 
   public create() {
-    this._app = new Application({
+    this._app = new PIXI.Application({
       width: 2048,
       height: 1536,
       backgroundColor: 0x333f48,
@@ -32,8 +32,8 @@ export class DisplayManager extends EventEmitter {
 
     globalThis.__PIXI_APP__ = this._app;
 
-    Ticker.shared.maxFPS = 60;
-    Ticker.shared.add((delta) => {
+    PIXI.Ticker.shared.maxFPS = 60;
+    PIXI.Ticker.shared.add((delta) => {
       this.emit(Events.UPDATE, delta);
       this.emit(Events.FPS, delta);
     });
@@ -64,7 +64,7 @@ export class DisplayManager extends EventEmitter {
     this._mainContainer.position.set(posX * 0.5, posY * 0.5);
   }
 
-  public get app(): Application {
+  public get app(): PIXI.Application {
     return this._app;
   }
 }
