@@ -1,4 +1,4 @@
-import { ResourceLoader } from "../managers/ResourceLoader";
+import { ResourceManager } from "../managers/ResourceManager";
 import { Main } from "../scenes/Main";
 import { gsap } from "gsap";
 

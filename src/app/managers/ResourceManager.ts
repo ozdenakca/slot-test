@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import { EventEmitter } from "eventemitter3";
 
-export class ResourceLoader extends EventEmitter {
+export class ResourceManager extends EventEmitter {
   private loader: PIXI.Loader;
   private assets = [
     { name: "background", url: "assets/background.jpg" },
