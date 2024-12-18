@@ -1,4 +1,4 @@
 # slot-test
 
-npm i 
+npm i &&
 npm start
