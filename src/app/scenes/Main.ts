@@ -1,10 +1,13 @@
 import "pixi-spine";
 import { Scene } from "../types/Scene";
 import { DisplayOrientation } from "../managers/DisplayManager";
-import { Graphics } from "pixi.js";
+import * as PIXI from "pixi.js";
 
 export class Main extends Scene {
-  public init() {}
+  public init() {
+    const sprite = new PIXI.Sprite(PIXI.Texture.from("brain"));
+    this.addChild(sprite);
+  }
 
   relayout(orientation: DisplayOrientation) {}
 

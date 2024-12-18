@@ -19,8 +19,8 @@ module.exports = (env, argv) => {
       extensions: [".ts", ".tsx", ".js", ".json"],
     },
     devServer: {
+      static: path.resolve(__dirname, "dist"), // Serve static files from "dist"
       open: true,
-      static: path.resolve(__dirname, "dist"),
       hot: true,
       port: 3000,
     },

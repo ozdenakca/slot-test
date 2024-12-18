@@ -16,12 +16,18 @@ export class ResourceLoader extends EventEmitter {
 
   public async loadAssets(): Promise<void> {
     try {
-      // Add assets to the loader
-      this.assets.forEach((asset) => this.loader.add(asset.name, asset.url));
+      this.assets.forEach((asset) => {
+        console.log(`Adding asset: ${asset.name} - ${asset.url}`);
+        this.loader.add(asset.name, asset.url);
+      });
 
-      // Load the assets
+      this.loader.onProgress.add((loader) => {
+        console.log(`Loading: ${loader.progress}%`);
+      });
+
       await new Promise<void>((resolve, reject) => {
-        this.loader.load(() => {
+        this.loader.load((loader, resources) => {
+          console.log("All assets loaded:", resources);
           this.emit("loadComplete");
           resolve();
         });
