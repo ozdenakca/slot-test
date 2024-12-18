@@ -2,6 +2,16 @@ import { DisplayManager } from "./managers/DisplayManager";
 import { SceneManager } from "./managers/SceneManager";
 import { LoaderStage } from "./scenes/Loader";
 import { ResourceManager } from "./managers/ResourceManager";
+import { SpinMediator } from "./mediators/SpinMediator";
+import { DependencyContainer } from "./utils/inject";
+
+export interface Mediator {
+  notify(sender: object, event: string): void;
+}
+
+export const TYPES = {
+  Mediator: Symbol.for("Mediator"),
+};
 
 export class Game {
   private _display: DisplayManager;
@@ -24,6 +34,7 @@ export class Game {
     this._resource.loadAssets();
     this._stage.createScene("LoaderStage", this._loader);
     this._stage.goToScene("LoaderStage", true);
+    DependencyContainer.register("SpinMediator", new SpinMediator());
   }
 
   public static get instance(): Game {

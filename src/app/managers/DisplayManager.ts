@@ -24,7 +24,7 @@ export class DisplayManager extends EventEmitter {
     this._app = new PIXI.Application({
       width: 2048,
       height: 1536,
-      backgroundColor: 0x333f48,
+      backgroundColor: 0x000,
       antialias: true,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
