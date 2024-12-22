@@ -10,6 +10,7 @@ import { PrepareSpinEffect } from "./effects/PrepareSpinEffect";
 import { DisableUIEffect } from "./effects/DisableUIEffect";
 import { SpinEffect } from "./effects/SpinEffect";
 import { Command } from "./types/Command";
+import { ShowWinEffect } from "./effects/ShowWinEffect";
 
 export interface Mediator {
   notify(sender: object, event: string): void;
@@ -43,6 +44,7 @@ export class Game {
       PrepareSpinEffect,
       DisableUIEffect,
       SpinEffect,
+      ShowWinEffect,
     ]);
     DependencyContainer.registerComponent(Machine, this, 100, 100);
     DependencyContainer.initialize();

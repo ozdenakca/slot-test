@@ -7,7 +7,6 @@ export class SpinEffect extends Effect {
   private _spinMediator: SpinMediator;
 
   async run(): Promise<void> {
-    this._spinMediator.updateIsSpinning(true);
-    console.log("spinning");
+    await this._spinMediator.updateIsSpinning(true);
   }
 }
