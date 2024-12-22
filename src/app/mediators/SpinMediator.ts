@@ -1,18 +1,20 @@
 import { BehaviorSubject } from "rxjs";
 import { AsyncBehaviorSubject } from "../types/AsyncBehaviorSubject";
 
+type SpinData = {
+  board: string[];
+};
+
 export class SpinMediator {
-  public isSpinning: AsyncBehaviorSubject<boolean> =
-    new AsyncBehaviorSubject<boolean>(false);
-  public spinCount: AsyncBehaviorSubject<number> =
-    new AsyncBehaviorSubject<number>(0);
+  private _spinData: SpinData;
 
-  async updateIsSpinning(value: boolean) {
-    console.log("VALUEE", value);
-    await this.isSpinning.next(value);
+  loadSpin(spinData: SpinData) {
+    this._spinData = spinData;
   }
 
-  updateSpinCount(value: number): void {
-    this.spinCount.next(value);
+  get board() {
+    return this._spinData.board;
   }
+
+  private calculateWin() {}
 }

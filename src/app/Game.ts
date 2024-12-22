@@ -11,6 +11,11 @@ import { DisableUIEffect } from "./effects/DisableUIEffect";
 import { SpinEffect } from "./effects/SpinEffect";
 import { Command } from "./types/Command";
 import { ShowWinEffect } from "./effects/ShowWinEffect";
+import { EnableUIEffect } from "./effects/EnableUIEffect";
+import { GameBackground } from "./components/GameBackground";
+import { SpinPanel } from "./components/SpinPanel";
+import { MachineMediator } from "./mediators/MachineMediator";
+import { Main } from "./scenes/Main";
 
 export interface Mediator {
   notify(sender: object, event: string): void;
@@ -32,21 +37,26 @@ export class Game {
     this.init();
   }
 
-  private init() {
+  private async init() {
     this.initManagers();
-    this.initLoading();
-    this.addDependecies();
+    await this.initLoading();
   }
 
   private addDependecies() {
     DependencyContainer.registerMediator(SpinMediator);
+    DependencyContainer.registerMediator(MachineMediator);
+
     DependencyContainer.registerCommand(SpinCommand, [
       PrepareSpinEffect,
       DisableUIEffect,
       SpinEffect,
       ShowWinEffect,
+      EnableUIEffect,
     ]);
-    DependencyContainer.registerComponent(Machine, this, 100, 100);
+
+    DependencyContainer.registerComponent(Machine, this);
+    DependencyContainer.registerComponent(GameBackground, this);
+    DependencyContainer.registerComponent(SpinPanel, this);
     DependencyContainer.initialize();
   }
 
@@ -57,11 +67,19 @@ export class Game {
     this._display.create();
   }
 
-  private initLoading() {
-    this._resource.loadAssets();
+  private async initLoading() {
     this._loader = new LoaderStage(this, "LoaderScene");
     this._stage.createScene("LoaderStage", this._loader);
-    this._stage.goToScene("LoaderStage", true);
+    await this._resource.loadAssets();
+    this.addDependecies();
+    this.onLoadComplete();
+  }
+
+  private onLoadComplete(): void {
+    console.log("Creating Main scene...");
+    this._stage.createScene("Main", new Main(this, "MainGame"));
+    console.log("Main scene created successfully");
+    this._stage.goToScene("Main", true);
   }
 
   public static get instance(): Game {

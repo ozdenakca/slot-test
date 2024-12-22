@@ -5,10 +5,9 @@ import { IResizable, Viewport } from "../managers/DisplayManager";
 export abstract class Component extends PIXI.Container implements IResizable {
   protected game: Game;
 
-  constructor(game: Game, x: number, y: number) {
+  constructor(game: Game) {
     super();
     this.game = game;
-    this.position.set(x, y);
     this.game.display.registerResizable(this);
   }
 
