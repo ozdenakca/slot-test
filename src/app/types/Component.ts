@@ -10,10 +10,11 @@ export abstract class Component extends PIXI.Container implements IResizable {
     this.game = game;
     this.position.set(x, y);
     this.game.display.registerResizable(this);
-    this.init();
   }
 
-  public abstract init(): void;
+  public postConstruct() {
+    this.game.display.registerResizable(this);
+  }
   public abstract resize(viewport: Viewport): void;
 
   public destroy(): void {

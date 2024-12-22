@@ -7,6 +7,7 @@ export class SpinMediator {
   public spinCount: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
   updateIsSpinning(value: boolean): void {
+    console.log("VALUEE", value);
     this.isSpinning.next(value);
   }
 

@@ -1,13 +1,15 @@
 import { SpinMediator } from "../mediators/SpinMediator";
 import { Component } from "../types/Component";
 import { Viewport } from "../managers/DisplayManager";
+import { Inject } from "../utils/inject";
+import { SpinCommand } from "../commands/SpinCommand";
 
 export class Machine extends Component {
-  init() {
-    const spinMediator = this.game.getDependency(SpinMediator);
-    this.game
-      .getDependency(SpinMediator)
-      .updateIsSpinning(!spinMediator.isSpinning.value);
+  @Inject(SpinMediator)
+  private _spinMediator: SpinMediator;
+
+  postConstruct() {
+    this.game.runCommand(SpinCommand);
   }
 
   public resize(viewport: Viewport): void {}
