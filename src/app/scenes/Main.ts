@@ -21,6 +21,7 @@ export class Main extends Scene {
     this.addChild(this._gameBackground);
     this.addChild(this._spinPanel);
     this.addChild(this._machine);
+    this._machine.position.set(-600, -600);
   }
 
   resize(viewport: Viewport) {}

@@ -5,6 +5,7 @@ import { Inject } from "../utils/inject";
 import { SpinCommand } from "../commands/SpinCommand";
 import { waitForSec } from "../utils/waitForSec";
 import { MACHINE_STATES, MachineMediator } from "../mediators/MachineMediator";
+import { GameBoard } from "./board/GameBoard";
 
 export class Machine extends Component {
   @Inject(MachineMediator)
@@ -13,7 +14,10 @@ export class Machine extends Component {
   @Inject(SpinMediator)
   private _spinMediator: SpinMediator;
 
+  private _gameBoard: GameBoard;
+
   postConstruct() {
+    this._gameBoard = new GameBoard();
     this._machineMediator.machineState.watch(async (value) => {
       switch (value) {
         case MACHINE_STATES.SPIN:
@@ -23,13 +27,12 @@ export class Machine extends Component {
           this.showWin();
           break;
       }
-      if (value) {
-        await this.spin();
-      }
     });
+    this.addChild(this._gameBoard);
   }
 
   async spin() {
+    this._gameBoard.startSpin();
     // const { board } = this._spinMediator;
     await waitForSec(3);
     console.log("spin is ending");

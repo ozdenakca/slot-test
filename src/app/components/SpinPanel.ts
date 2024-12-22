@@ -1,17 +1,26 @@
-import { SpinMediator } from "../mediators/SpinMediator";
 import { Component } from "../types/Component";
 import { Viewport } from "../managers/DisplayManager";
-import { Inject } from "../utils/inject";
+import { Button } from "../types/Button";
 import { SpinCommand } from "../commands/SpinCommand";
-import { waitForSec } from "../utils/waitForSec";
-import { MACHINE_STATES, MachineMediator } from "../mediators/MachineMediator";
 
 export class SpinPanel extends Component {
+  private _spinButton: Button;
+
   postConstruct() {
-    this.createSpinButton();
+    this._spinButton = this.createSpinButton();
   }
 
-  private createSpinButton() {}
+  private createSpinButton() {
+    const button = new Button("btn_spin");
+    this.addChild(button);
+    button.on("buttonClick", () => {
+      this.game.runCommand(SpinCommand);
+    });
 
-  public resize(viewport: Viewport): void {}
+    return button;
+  }
+
+  public resize(viewport: Viewport): void {
+    this._spinButton.position.set(600, 600);
+  }
 }

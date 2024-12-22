@@ -1,3 +1,5 @@
+import { Game } from "../Game";
+
 export function Inject(classType: new (...args: any[]) => any) {
   return function (target: any, context: ClassFieldDecoratorContext) {
     if (context.kind !== "field") {
@@ -92,6 +94,13 @@ export class DependencyContainer {
     this.components.forEach((component) => {
       if ("postConstruct" in component) {
         component.postConstruct();
+      }
+    });
+
+    this.components.forEach((component) => {
+      if ("resize" in component) {
+        const viewport = Game.instance.display.viewport;
+        component.resize(viewport);
       }
     });
   }
