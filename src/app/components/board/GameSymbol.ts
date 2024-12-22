@@ -13,4 +13,8 @@ export class GameSymbol extends PIXI.Sprite {
       this.texture = PIXI.Texture.from(SYMBOLS[value]);
     }
   }
+
+  setType(value: string) {
+    this.texture = PIXI.Texture.from(value);
+  }
 }

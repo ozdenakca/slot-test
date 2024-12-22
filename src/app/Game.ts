@@ -17,6 +17,8 @@ import { SpinPanel } from "./components/SpinPanel";
 import { MachineMediator } from "./mediators/MachineMediator";
 import { Main } from "./scenes/Main";
 import { SpinPanelMediator } from "./mediators/SpinPanelMediator";
+import { Reel } from "./components/board/Reel";
+import { GameBoard } from "./components/board/GameBoard";
 
 export interface Mediator {
   notify(sender: object, event: string): void;
@@ -59,6 +61,7 @@ export class Game {
     DependencyContainer.registerComponent(Machine, this);
     DependencyContainer.registerComponent(GameBackground, this);
     DependencyContainer.registerComponent(SpinPanel, this);
+
     DependencyContainer.initialize();
   }
 

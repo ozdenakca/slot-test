@@ -1,7 +1,7 @@
 import { Reel } from "./Reel";
 import { Viewport } from "../../managers/DisplayManager";
 import * as PIXI from "pixi.js";
-import { AsyncBehaviorSubject } from "../../types/AsyncBehaviorSubject";
+import { Component } from "../../types/Component";
 
 export const SYMBOLS = [
   "a",
@@ -19,18 +19,13 @@ export const SYMBOLS = [
   "zombie_guy",
 ];
 
-export class GameBoard extends PIXI.Container {
+export class GameBoard extends Component {
   private reels: Reel[] = [];
   private currentStoppingReel = 0;
 
-  constructor() {
-    super();
-    this.createReels();
-  }
-
-  private createReels() {
+  public createReels() {
     for (let i = 0; i < 3; i++) {
-      const reel = new Reel();
+      const reel = new Reel(this.game);
       reel.position.x = i * 320;
       this.reels.push(reel);
       this.addChild(reel);
@@ -39,29 +34,15 @@ export class GameBoard extends PIXI.Container {
 
   public async startSpin(stoppingSymbols: string[][]): Promise<void> {
     this.currentStoppingReel = 0;
-
-    // Start spinning all reels
-    this.reels.forEach((reel) => reel.startSpin());
-
-    // Wait for a short duration before starting to stop each reel
+    console.log("REEELSS", this.reels.length);
+    this.reels.forEach((reel, index) =>
+      reel.startSpin(stoppingSymbols[index], index * 0.2)
+    );
     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Stop each reel in sequence
-    for (let i = 0; i < this.reels.length; i++) {
-      await this.stopReel(i, this.convertSymbolsToIndices(stoppingSymbols[i]));
-    }
   }
 
   private convertSymbolsToIndices(symbols: string[]): number[] {
     return symbols.map((symbol) => SYMBOLS.indexOf(symbol));
-  }
-
-  private stopReel(reelIndex: number, symbols: number[]): Promise<void> {
-    return new Promise((resolve) => {
-      this.reels[reelIndex].stop(symbols, () => {
-        resolve(); // Resolve the promise after the reel has stopped
-      });
-    });
   }
 
   public resize(viewport: Viewport): void {

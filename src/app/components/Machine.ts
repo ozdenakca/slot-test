@@ -17,7 +17,7 @@ export class Machine extends Component {
   private _gameBoard: GameBoard;
 
   postConstruct() {
-    this._gameBoard = new GameBoard();
+    this._gameBoard = new GameBoard(this.game);
     this._machineMediator.machineState.watch(async (value) => {
       switch (value) {
         case MACHINE_STATES.SPIN:
@@ -29,6 +29,7 @@ export class Machine extends Component {
       }
     });
     this.addChild(this._gameBoard);
+    this._gameBoard.createReels();
   }
 
   async spin() {
