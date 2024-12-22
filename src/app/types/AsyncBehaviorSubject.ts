@@ -1,28 +1,34 @@
-// AsyncBehaviorSubject.ts
 import { BehaviorSubject } from "rxjs";
 
 export class AsyncBehaviorSubject<T> extends BehaviorSubject<T> {
-  private activePromises: Promise<void>[] = [];
+  private activeSubscriptions: Map<number, Promise<void>> = new Map();
+  private subscriptionCounter: number = 0;
 
-  watch(callback: (value: T) => void | Promise<void>) {
+  watch(callback: (value: T) => void | Promise<void>): void {
+    const subscriptionId = this.subscriptionCounter++;
+
     this.subscribe(async (value) => {
-      const result = callback(value);
-      if (result instanceof Promise) {
-        this.activePromises.push(result);
-        try {
+      try {
+        const result = callback(value);
+        if (result instanceof Promise) {
+          this.activeSubscriptions.set(subscriptionId, result);
           await result;
-        } finally {
-          const index = this.activePromises.indexOf(result);
-          if (index > -1) {
-            this.activePromises.splice(index, 1);
-          }
         }
+      } finally {
+        this.activeSubscriptions.delete(subscriptionId);
       }
     });
   }
 
   async next(value: T): Promise<void> {
     super.next(value);
-    await Promise.all(this.activePromises);
+
+    if (this.activeSubscriptions.size > 0) {
+      await Promise.all(Array.from(this.activeSubscriptions.values()));
+    }
+  }
+
+  getCurrentPromises(): Promise<void>[] {
+    return Array.from(this.activeSubscriptions.values());
   }
 }

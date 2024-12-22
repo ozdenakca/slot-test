@@ -1,11 +1,27 @@
 import { Reel } from "./Reel";
 import { Viewport } from "../../managers/DisplayManager";
 import * as PIXI from "pixi.js";
+import { AsyncBehaviorSubject } from "../../types/AsyncBehaviorSubject";
+
+export const SYMBOLS = [
+  "a",
+  "bonus",
+  "brain",
+  "eye",
+  "freespin",
+  "j",
+  "k",
+  "q",
+  "skull",
+  "wild",
+  "zombie",
+  "zombie_girl",
+  "zombie_guy",
+];
 
 export class GameBoard extends PIXI.Container {
   private reels: Reel[] = [];
   private currentStoppingReel = 0;
-  private isSpinning = false;
 
   constructor() {
     super();
@@ -14,59 +30,37 @@ export class GameBoard extends PIXI.Container {
 
   private createReels() {
     for (let i = 0; i < 3; i++) {
-      const reel = new Reel(i);
+      const reel = new Reel();
       reel.position.x = i * 320;
       this.reels.push(reel);
       this.addChild(reel);
     }
   }
 
-  public async startSpin(): Promise<void> {
-    if (this.isSpinning) return;
-
-    this.isSpinning = true;
+  public async startSpin(stoppingSymbols: string[][]): Promise<void> {
     this.currentStoppingReel = 0;
 
-    // Start all reels spinning
-    this.reels.forEach((reel) => reel.spin());
+    // Start spinning all reels
+    this.reels.forEach((reel) => reel.startSpin());
 
-    // Generate stopping symbols for 3x3 grid
-    const stoppingSymbols = this.generateStoppingSymbols();
-
-    // Wait for initial spin time
+    // Wait for a short duration before starting to stop each reel
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Stop reels one by one
+    // Stop each reel in sequence
     for (let i = 0; i < this.reels.length; i++) {
-      await this.stopReel(i, stoppingSymbols[i]);
-      // Wait between reel stops
-      if (i < this.reels.length - 1) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
+      await this.stopReel(i, this.convertSymbolsToIndices(stoppingSymbols[i]));
     }
-
-    this.isSpinning = false;
   }
 
-  private generateStoppingSymbols(): number[][] {
-    const symbols: number[][] = [];
-
-    // Generate for each reel
-    for (let i = 0; i < 3; i++) {
-      const reelSymbols: number[] = [];
-      // Generate 3 symbols for each reel
-      for (let j = 0; j < 3; j++) {
-        reelSymbols.push(Math.floor(Math.random() * 13));
-      }
-      symbols.push(reelSymbols);
-    }
-
-    return symbols;
+  private convertSymbolsToIndices(symbols: string[]): number[] {
+    return symbols.map((symbol) => SYMBOLS.indexOf(symbol));
   }
 
   private stopReel(reelIndex: number, symbols: number[]): Promise<void> {
     return new Promise((resolve) => {
-      this.reels[reelIndex].stop(symbols, resolve);
+      this.reels[reelIndex].stop(symbols, () => {
+        resolve(); // Resolve the promise after the reel has stopped
+      });
     });
   }
 

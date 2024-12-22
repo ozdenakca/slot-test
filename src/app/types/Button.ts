@@ -39,7 +39,6 @@ export class Button extends PIXI.Container {
     );
     this.on("click", () => !this.disabled && this.emit("buttonClick"));
 
-    // Set initial texture
     this.updateTexture(ButtonState.IDLE);
   }
 

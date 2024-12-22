@@ -21,10 +21,10 @@ export class Machine extends Component {
     this._machineMediator.machineState.watch(async (value) => {
       switch (value) {
         case MACHINE_STATES.SPIN:
-          this.spin();
+          await this.spin();
           break;
         case MACHINE_STATES.WIN:
-          this.showWin();
+          await this.showWin();
           break;
       }
     });
@@ -32,10 +32,12 @@ export class Machine extends Component {
   }
 
   async spin() {
-    this._gameBoard.startSpin();
-    // const { board } = this._spinMediator;
-    await waitForSec(3);
-    console.log("spin is ending");
+    const symbols = [
+      ["zombie", "brain", "skull"], // First reel
+      ["wild", "zombie_girl", "eye"], // Second reel
+      ["bonus", "zombie_guy", "freespin"], // Third reel
+    ];
+    await this._gameBoard.startSpin(symbols);
   }
 
   async showWin() {

@@ -1,20 +1,5 @@
-const SYMBOLS = [
-  "a",
-  "bonus",
-  "brain",
-  "eye",
-  "freespin",
-  "j",
-  "k",
-  "q",
-  "skull",
-  "wild",
-  "zombie",
-  "zombie_girl",
-  "zombie_guy",
-];
-
 import * as PIXI from "pixi.js";
+import { SYMBOLS } from "./GameBoard";
 
 export class GameSymbol extends PIXI.Sprite {
   private _index;

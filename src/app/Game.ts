@@ -16,6 +16,7 @@ import { GameBackground } from "./components/GameBackground";
 import { SpinPanel } from "./components/SpinPanel";
 import { MachineMediator } from "./mediators/MachineMediator";
 import { Main } from "./scenes/Main";
+import { SpinPanelMediator } from "./mediators/SpinPanelMediator";
 
 export interface Mediator {
   notify(sender: object, event: string): void;
@@ -45,6 +46,7 @@ export class Game {
   private addDependecies() {
     DependencyContainer.registerMediator(SpinMediator);
     DependencyContainer.registerMediator(MachineMediator);
+    DependencyContainer.registerMediator(SpinPanelMediator);
 
     DependencyContainer.registerCommand(SpinCommand, [
       PrepareSpinEffect,
@@ -76,9 +78,7 @@ export class Game {
   }
 
   private onLoadComplete(): void {
-    console.log("Creating Main scene...");
     this._stage.createScene("Main", new Main(this, "MainGame"));
-    console.log("Main scene created successfully");
     this._stage.goToScene("Main", true);
   }
 

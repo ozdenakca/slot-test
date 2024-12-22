@@ -1,7 +1,5 @@
 import { Effect } from "../types/Command";
 
 export class PrepareSpinEffect extends Effect {
-  async run(): Promise<void> {
-    console.log("Preparing spin");
-  }
+  async run(): Promise<void> {}
 }
