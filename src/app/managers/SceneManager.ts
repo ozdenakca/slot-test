@@ -31,7 +31,7 @@ export class SceneManager {
           this._currentStage.visible = false;
           this._scenes[id].visible = true;
         }
-        this._currentStage.dispose();
+        this._currentStage.destroy();
       }
       this._mainContainer.addChild(this._scenes[id]);
       this._currentStage = this._scenes[id];

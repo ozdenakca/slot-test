@@ -26,6 +26,8 @@ export class Game {
   }
 
   private init() {
+    DependencyContainer.register("SpinMediator", new SpinMediator());
+    DependencyContainer.initialize();
     this._stage = new SceneManager(this);
     this._display = new DisplayManager(this._stage.main);
     this._display.create();
@@ -34,7 +36,6 @@ export class Game {
     this._resource.loadAssets();
     this._stage.createScene("LoaderStage", this._loader);
     this._stage.goToScene("LoaderStage", true);
-    DependencyContainer.register("SpinMediator", new SpinMediator());
   }
 
   public static get instance(): Game {
@@ -50,5 +51,9 @@ export class Game {
   }
   public get resource(): any {
     return this._resource;
+  }
+
+  getDependency<T>(type: new (...args: any[]) => T): T {
+    return DependencyContainer.resolve(type.name) as T;
   }
 }

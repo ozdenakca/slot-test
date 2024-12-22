@@ -1,27 +1,25 @@
-export function Inject(key: string) {
-  return function (target: any, context: ClassFieldDecoratorContext): void {
-    if (context.kind !== "field") {
-      throw new Error("@Inject can only be used on class fields.");
-    }
-
-    context.addInitializer(function () {
-      (this as any)[context.name] = DependencyContainer.resolve(key);
-    });
-  };
-}
-
 export class DependencyContainer {
-  private static dependencies = new Map<string, any>();
+  private static container: Map<string, any> = new Map();
+  private static isInitialized = false;
 
-  static register<T>(key: string, implementation: T): void {
-    this.dependencies.set(key, implementation);
+  public static register<T>(key: string, instance: T): void {
+    this.container.set(key, instance);
   }
 
-  static resolve<T>(key: string): T {
-    const dependency = this.dependencies.get(key);
-    if (!dependency) {
-      throw new Error(`Dependency "${key}" not found`);
+  public static resolve<T>(key: string): T {
+    if (!this.isInitialized) {
+      throw new Error(
+        "Trying to resolve dependency before initialization is complete"
+      );
     }
-    return dependency;
+    const instance = this.container.get(key);
+    if (!instance) {
+      throw new Error(`No registration found for key: ${key}`);
+    }
+    return instance as T;
+  }
+
+  public static initialize(): void {
+    this.isInitialized = true;
   }
 }
