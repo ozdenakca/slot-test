@@ -39,7 +39,6 @@ export class Machine extends Component {
 
   async showWin() {
     const { wins } = this._spinMediator;
-    console.log(wins);
     if (wins.length > 0) {
       this._gameBoard.showWin(wins);
     }

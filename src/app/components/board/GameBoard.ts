@@ -60,7 +60,6 @@ export class GameBoard extends PIXI.Container {
 
   getSymbol(grid: SymbolGrid): GameSymbol | undefined {
     const column = this._symbols[grid.column];
-    console.log("COLUMNN", column);
     return column ? column[grid.row] : undefined;
   }
 }
