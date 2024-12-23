@@ -10,7 +10,7 @@ export class PrepareSpinEffect extends Effect {
   async run(): Promise<void> {
     const board = [
       ["zombie", "brain", "skull"], // First reel
-      ["wild", "zombie", "eye"], // Second reel
+      ["eye", "zombie", "eye"], // Second reel
       ["bonus", "zombie_guy", "zombie"], // Third reel
     ];
     this._spinMediator.loadSpin({

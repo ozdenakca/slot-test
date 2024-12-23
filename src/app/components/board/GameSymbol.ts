@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js";
 import { SYMBOLS } from "./GameBoard";
+import gsap from "gsap";
 
 export type SymbolGrid = {
   column: number;
