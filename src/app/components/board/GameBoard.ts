@@ -1,7 +1,7 @@
 import { Reel } from "./Reel";
 import { Viewport } from "../../managers/DisplayManager";
 import * as PIXI from "pixi.js";
-import { Component } from "../../types/Component";
+import { GameSymbol, SymbolGrid } from "./GameSymbol";
 
 export const SYMBOLS = [
   "a",
@@ -19,30 +19,36 @@ export const SYMBOLS = [
   "zombie_guy",
 ];
 
-export class GameBoard extends Component {
-  private reels: Reel[] = [];
-  private currentStoppingReel = 0;
+export class GameBoard extends PIXI.Container {
+  private _reels: Reel[] = [];
+  private _symbols: GameSymbol[][] = [];
 
   public createReels() {
     for (let i = 0; i < 3; i++) {
-      const reel = new Reel(this.game);
+      const reel = new Reel(i);
       reel.position.x = i * 320;
-      this.reels.push(reel);
+      this._reels.push(reel);
       this.addChild(reel);
+      this._symbols.push(reel.symbols);
     }
   }
 
   public async startSpin(stoppingSymbols: string[][]): Promise<void> {
-    this.currentStoppingReel = 0;
-    console.log("REEELSS", this.reels.length);
-    this.reels.forEach((reel, index) =>
-      reel.startSpin(stoppingSymbols[index], index * 0.2)
+    const promises = [];
+    this._reels.forEach((reel, index) =>
+      promises.push(reel.startSpin(stoppingSymbols[index]))
     );
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await Promise.all(promises);
   }
 
-  private convertSymbolsToIndices(symbols: string[]): number[] {
-    return symbols.map((symbol) => SYMBOLS.indexOf(symbol));
+  public showWin(winLines: SymbolGrid[][]) {
+    winLines.forEach((winLine) => {
+      winLine.forEach((grid) => {
+        const symbol = this.getSymbol(grid);
+        symbol.connect();
+      });
+    });
+    this._symbols.flat().forEach((symbol) => symbol.dim());
   }
 
   public resize(viewport: Viewport): void {
@@ -50,5 +56,11 @@ export class GameBoard extends Component {
       viewport.width / viewport.scale / 2 - (320 * 3) / 2,
       viewport.height / viewport.scale / 2 - 450
     );
+  }
+
+  getSymbol(grid: SymbolGrid): GameSymbol | undefined {
+    const column = this._symbols[grid.column];
+    console.log("COLUMNN", column);
+    return column ? column[grid.row] : undefined;
   }
 }

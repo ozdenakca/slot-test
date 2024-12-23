@@ -1,9 +1,5 @@
 import { gsap } from "gsap";
 import { GameSymbol } from "./GameSymbol";
-import { Component } from "../../types/Component";
-import { Game } from "../../Game";
-import { Events } from "../../Events";
-import { Viewport } from "../../managers/DisplayManager";
 import * as PIXI from "pixi.js";
 import { waitForSec } from "../../utils/waitForSec";
 
@@ -11,19 +7,20 @@ const ROW = 4;
 const S_HEIGHT = 300;
 const BORDER_Y = (ROW / 2 + 1) * S_HEIGHT;
 const TOTAL_HEIGHT = (ROW + 1) * S_HEIGHT;
-const SPEED = 0.05;
-const MAX_PROGRESS = 3;
-const MIN_DEC_SPEED_FACTOR = 0.04;
-const BOUNCE_DURATION = 0.3;
+const SPIN_DURATION = 1.2; // Duration for initial spin
+const DECELERATION_DURATION = 0.4; // Duration for deceleration
+const BOUNCE_DURATION = 0.15;
 
-export class Reel extends Component {
-  private _progress = 0;
+export class Reel extends PIXI.Container {
   private _symbols: GameSymbol[] = [];
-  private _stopping = false;
   private _displaySymbols: string[] = [];
+  private _currentTween?: gsap.core.Tween;
+  private _stopping = false;
+  private _id: number;
 
-  constructor(game: Game) {
-    super(game);
+  constructor(id: number) {
+    super();
+    this._id = id;
     this.init();
   }
 
@@ -35,79 +32,91 @@ export class Reel extends Component {
     this.mask = spinMask;
     this.addChild(spinMask);
 
-    // Create 5 symbols stacked vertically
     for (let i = 0; i < 5; i++) {
-      const symbol = new GameSymbol(1);
+      const symbol = new GameSymbol(1, this._id, i);
       symbol.position.y = i * S_HEIGHT;
       this._symbols.push(symbol);
       this.addChild(symbol);
     }
   }
 
-  public async startSpin(stoppingSymbols: string[], delay: number) {
+  public async startSpin(stoppingSymbols: string[]): Promise<void> {
     this._displaySymbols = stoppingSymbols;
-    this.resetPositionsAndProgress();
-    this.game.display.on(Events.UPDATE, this.spin, this);
+    this._stopping = false;
+    this.resetPositions();
+    if (this._currentTween) {
+      this._currentTween.kill();
+    }
+    this._progress = 0;
+    return new Promise((resolve) => {
+      this._currentTween = gsap.to(this, {
+        progress: 3 + (this._id * 0.3) / 3,
+        duration: SPIN_DURATION + (this._id * 0.3) / SPIN_DURATION,
+        ease: "none",
+        onComplete: () => {
+          this.startDeceleration(resolve);
+        },
+      });
+    });
   }
 
-  private spin = () => {
-    if (this.progress > MAX_PROGRESS) {
-      this.game.display.off(Events.UPDATE, this.spin, this);
-      const remainder = Math.ceil(this.progress) - this.progress;
-      this.decelerate(remainder);
-    } else {
-      this.progress += SPEED;
-    }
-  };
+  set stopping(value: boolean) {}
 
-  private decelerate(rProgress: number) {
-    let dProgress = rProgress + 1;
-    const tProgress = this.progress + dProgress;
-
-    const onUpdate = () => {
-      if (dProgress <= 1) {
-        this._stopping = true;
-      }
-
-      let dSpeed = dProgress / 3.5;
-      dSpeed = Math.max(dSpeed, MIN_DEC_SPEED_FACTOR);
-      dProgress -= dSpeed;
-      this.progress += dSpeed;
-      if (this.progress >= tProgress + MIN_DEC_SPEED_FACTOR) {
-        this.game.display.off(Events.UPDATE, onUpdate, this);
-
-        gsap.to(this, {
+  private startDeceleration(resolve: (value: void) => void) {
+    const targetProgress = Math.ceil(this.progress) + 1;
+    this._currentTween = gsap.to(this, {
+      progress: targetProgress,
+      duration: DECELERATION_DURATION,
+      ease: "power1.out",
+      onUpdate: async () => {
+        if (targetProgress - this.progress <= 1) {
+          this._stopping = true;
+        }
+      },
+      onComplete: () => {
+        this.setFinalSymbols();
+        this._currentTween = gsap.to(this, {
+          progress: targetProgress,
           duration: BOUNCE_DURATION,
-          progress: tProgress,
+          ease: "bounce.out",
           onComplete: () => {
             this.finishSpin();
+            resolve();
           },
         });
+      },
+    });
+  }
+
+  private setFinalSymbols() {
+    for (let i = 0; i < this._symbols.length; i++) {
+      if (this._displaySymbols[i]) {
+        this._symbols[i].setType(this._displaySymbols[i]);
       }
-    };
-    this.game.display.on(Events.UPDATE, onUpdate, this);
-    onUpdate();
+      this._symbols[i].position.y = i * S_HEIGHT;
+    }
   }
 
   private finishSpin() {
     this._stopping = false;
     this._progress = 0;
+    this.setFinalSymbols();
+  }
 
+  private resetPositions() {
     for (let i = 0; i < this._symbols.length; i++) {
       this._symbols[i].position.y = i * S_HEIGHT;
     }
   }
 
   public dispose() {
-    this.game.display.off(Events.UPDATE, this.spin, this);
+    if (this._currentTween) {
+      this._currentTween.kill();
+    }
+    this.destroy({ children: true });
   }
 
-  private resetPositionsAndProgress() {
-    this._progress = 0;
-    for (let i = 0; i < this._symbols.length; i++) {
-      this._symbols[i].position.y = i * S_HEIGHT;
-    }
-  }
+  private _progress = 0;
 
   public get progress(): number {
     return this._progress;
@@ -130,7 +139,11 @@ export class Reel extends Component {
     }
   }
 
-  public resize(viewport: Viewport): void {
-    // if you need dynamic resizing, implement here
+  public resize(width: number, height: number): void {
+    // Implement resize logic if needed
+  }
+
+  get symbols(): GameSymbol[] {
+    return this._symbols;
   }
 }
