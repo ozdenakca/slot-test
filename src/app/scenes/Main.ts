@@ -3,15 +3,25 @@ import { Scene } from "../types/Scene";
 import { Viewport } from "../managers/DisplayManager";
 import * as PIXI from "pixi.js";
 import { Machine } from "../components/Machine";
+import { Inject } from "../utils/inject";
+import { GameBackground } from "../components/GameBackground";
+import { SpinPanel } from "../components/SpinPanel";
 
 export class Main extends Scene {
-  public init() {
-    const sprite = new PIXI.Sprite(PIXI.Texture.from("background"));
-    this.addChild(sprite);
-    sprite.anchor.set(0.5);
+  @Inject(GameBackground)
+  private _gameBackground: GameBackground;
 
-    const machine = new Machine(this.game, 0, 0);
-    this.addChild(machine);
+  @Inject(SpinPanel)
+  private _spinPanel: SpinPanel;
+
+  @Inject(Machine)
+  private _machine: Machine;
+
+  public init() {
+    this.addChild(this._gameBackground);
+    this.addChild(this._spinPanel);
+    this.addChild(this._machine);
+    this._machine.position.set(-600, -600);
   }
 
   resize(viewport: Viewport) {}

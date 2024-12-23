@@ -1,16 +1,18 @@
-import { BehaviorSubject } from "rxjs";
+import { AsyncBehaviorSubject } from "../types/AsyncBehaviorSubject";
+
+export enum MACHINE_STATES {
+  SPIN,
+  WIN,
+  IDLE,
+}
 
 export class MachineMediator {
-  public isSpinning: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-    false
-  );
-  public spinCount: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  public machineState: AsyncBehaviorSubject<MACHINE_STATES> =
+    new AsyncBehaviorSubject<MACHINE_STATES>(MACHINE_STATES.IDLE);
+  public spinCount: AsyncBehaviorSubject<number> =
+    new AsyncBehaviorSubject<number>(0);
 
-  updateIsSpinning(value: boolean): void {
-    this.isSpinning.next(value);
-  }
-
-  updateSpinCount(value: number): void {
-    this.spinCount.next(value);
+  async updateMachineState(value: MACHINE_STATES) {
+    await this.machineState.next(value);
   }
 }

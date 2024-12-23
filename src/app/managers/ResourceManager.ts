@@ -7,6 +7,7 @@ export class ResourceManager extends EventEmitter {
     { name: "background", url: "assets/background.jpg" },
     { name: "symbols", url: "assets/slotSymbols.json" },
     { name: "coin", url: "assets/coin.png" },
+    { name: "pack", url: "assets/pack-0.json" },
   ];
 
   constructor() {

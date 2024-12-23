@@ -100,7 +100,7 @@ export class DisplayManager extends EventEmitter {
     );
 
     this._resizableComponents.forEach((component) => {
-      component.resize(this._viewport);
+      component?.resize(this._viewport);
     });
 
     this.emit(Events.VIEWPORT_RESIZE, this._viewport);
@@ -108,7 +108,6 @@ export class DisplayManager extends EventEmitter {
 
   public registerResizable(component: IResizable): void {
     this._resizableComponents.add(component);
-    component.resize(this._viewport);
   }
 
   public unregisterResizable(component: IResizable): void {
